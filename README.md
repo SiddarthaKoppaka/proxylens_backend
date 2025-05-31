@@ -50,6 +50,9 @@ ProxyLens is a powerful RAG-based document retrieval and generation system desig
 * `ollama-service`: Lightweight container with LLaMA-3 model preloaded
 * `qdrant`: Already hosted on AWS (external URL)
 
+  ![image](https://github.com/user-attachments/assets/0608b64c-20d9-4bd3-a041-5088f228c654)
+
+
 ---
 
 ### ✅ Deployment Steps (Locally with Minikube):
