@@ -1,10 +1,3 @@
-Here are neat, professional GitHub README files for both the **frontend** and **backend** of your project. The backend README includes a clear **deployment architecture section** as requested.
-
----
-
-### 📁 `rag-backend/README.md`
-
-````markdown
 # 🧠 ThinkWise RAG Backend (FastAPI + LangGraph + Ollama)
 
 This is the backend for the ThinkWise AI platform — a LangGraph-powered Reasoning Agent that estimates **ROI** and **Implementation Effort** for business ideas using LLMs (like LLaMA 3 via Ollama). It provides an explainable and interactive analysis API.
