@@ -1,20 +1,20 @@
-# 🧠 ThinkWise RAG Backend (FastAPI + LangGraph + Ollama)
+# ProxyLens RAG Backend (FastAPI + LangGraph + Ollama)
 
 This is the backend for the ThinkWise AI platform — a LangGraph-powered Reasoning Agent that estimates **ROI** and **Implementation Effort** for business ideas using LLMs (like LLaMA 3 via Ollama). It provides an explainable and interactive analysis API.
 
 ---
 
-## 🚀 Features
+## Features
 
-- 🔁 ReAct-based LangGraph agent
-- 🤖 LLM-powered reasoning and scoring (via Ollama)
-- 📈 Returns top 3 business ideas with explanation
-- 🌐 FastAPI REST endpoints
-- ⚙️ Dockerized and Kubernetes-ready
+- ReAct-based LangGraph agent
+- LLM-powered reasoning and scoring (via Ollama)
+- Returns top 3 business ideas with explanation
+- FastAPI REST endpoints
+- Dockerized and Kubernetes-ready
 
 ---
 
-## 🧬 API Endpoints
+## API Endpoints
 
 | Endpoint             | Method | Description                            |
 |----------------------|--------|----------------------------------------|
@@ -25,15 +25,15 @@ This is the backend for the ThinkWise AI platform — a LangGraph-powered Reason
 
 ---
 
-## ⚙️ Local Development
+## Local Development
 
-### 📦 Install
+### Install
 
 ```bash
 pip install -r requirements.txt
 ````
 
-### ▶️ Run
+### Run
 
 ```bash
 uvicorn app:app --reload --port 8000
@@ -41,7 +41,7 @@ uvicorn app:app --reload --port 8000
 
 ---
 
-## 🐳 Docker
+## Docker
 
 ```bash
 docker build -t rag-backend-slim .
@@ -50,15 +50,15 @@ docker run -p 8000:8000 rag-backend-slim
 
 ---
 
-## ☸️ Kubernetes Deployment (Minikube)
+##  Kubernetes Deployment (Minikube)
 
-### 🗂️ Namespace
+###  Namespace
 
 ```bash
 kubectl create namespace thinkwise-ai
 ```
 
-### 📄 Apply Resources
+### Apply Resources
 
 ```bash
 kubectl apply -f k8s-deployment.yaml
@@ -66,7 +66,7 @@ kubectl apply -f k8s-deployment.yaml
 
 ---
 
-## 🏗️ Deployment Architecture
+## Deployment Architecture
 
 ```text
                     +----------------------+
@@ -91,7 +91,7 @@ kubectl apply -f k8s-deployment.yaml
 All components are deployed as containers using **Minikube + Docker driver**.
 
 
-## 📌 TODO
+## TODO
 
 * MongoDB persistence for chat/idea history
 * Fine-tuned scoring logic
