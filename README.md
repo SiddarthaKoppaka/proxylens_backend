@@ -19,7 +19,8 @@ ProxyLens is a powerful RAG-based document retrieval and generation system desig
 
 ## 🏗️ Backend Architecture
 
-![RAG - Proxy](https://github.com/user-attachments/assets/711f7ffc-ae8f-4e36-9177-14d18e29c375)
+![RAG - Proxy](https://github.com/user-attachments/assets/da9df66e-5aac-43eb-b32e-d59a8e9ad5ba)
+
 
 ---
 
