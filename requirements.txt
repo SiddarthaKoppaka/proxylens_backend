@@ -1,0 +1,25 @@
+# LangChain and ecosystem
+langchain-ollama
+langchain
+langchain-qdrant
+langchain-community
+langchain-huggingface
+
+# Model + Embeddings
+sentence-transformers
+torch==2.2.0+cpu
+--extra-index-url https://download.pytorch.org/whl/cpu
+numpy<2.0
+
+# FastAPI server
+fastapi[standard]
+uvicorn[standard]
+
+# Environment & utils
+python-dotenv
+tavily-python
+pymongo
+pydantic
+jwt
+lark
+pandas
