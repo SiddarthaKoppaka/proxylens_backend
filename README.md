@@ -1,100 +1,157 @@
-# ProxyLens RAG Backend (FastAPI + LangGraph + Ollama)
+# ProxyLens Backend
 
-This is the backend for the ThinkWise AI platform — a LangGraph-powered Reasoning Agent that estimates **ROI** and **Implementation Effort** for business ideas using LLMs (like LLaMA 3 via Ollama). It provides an explainable and interactive analysis API.
-
----
-
-## Features
-
-- ReAct-based LangGraph agent
-- LLM-powered reasoning and scoring (via Ollama)
-- Returns top 3 business ideas with explanation
-- FastAPI REST endpoints
-- Dockerized and Kubernetes-ready
+ProxyLens is a powerful RAG-based document retrieval and generation system designed for long HTML documents with deep contextual metadata. The backend orchestrates multiple components, including vector stores, metadata search, and LLM-driven tools to provide highly relevant and explainable summaries for complex documents.
 
 ---
 
-## API Endpoints
+## 🧠 Core Features
 
-| Endpoint             | Method | Description                            |
-|----------------------|--------|----------------------------------------|
-| `/analyze/csv`       | POST   | Upload CSV of ideas for analysis       |
-| `/analyze/json`      | POST   | Submit ideas as JSON                   |
-| `/ideas`             | GET    | Fetch stored ideas                     |
-| `/analyze/single`    | POST   | Analyze a single idea (WIP)            |
+* 🔍 **Semantic Search using Qdrant + Metadata Filtering**
+* 🏷️ **Auto Metadata Tagging using LLaMA-3 model**
+* 🗃️ **Self Querying Retriever** (LangChain) for context-aware search
+* 🌐 **Tavily Web Search fallback**
+* 📈 **LLM Evaluation Layer** to assess retrieval quality
+* 🧭 **Intelligent Router** to choose between retriever/metadata/web
+* 📦 **Multi-source Retrieval Pipeline**: Vector DB, CSV, Web
+* 🛠️ **Modular Microservices with FastAPI**
 
 ---
 
-## Local Development
+## 🏗️ Backend Architecture
 
-### Install
-
-```bash
-pip install -r requirements.txt
-````
-
-### Run
-
-```bash
-uvicorn app:app --reload --port 8000
+```
+        ┌─────────────────────────────┐
+        │         User Query         │
+        └────────────┬───────────────┘
+                     ↓
+              ┌─────────────┐
+              │   Router    │  ◄─── Decides retrieval strategy:
+              └────┬────────┘       - Self Query Retriever (Qdrant)
+                   │               - Metadata CSV lookup
+                   │               - Tavily Web Search
+        ┌──────────▼───────────┐
+        │   Retrieval Layer    │
+        │ ┌────────┐  ┌──────┐ │
+        │ │Vector  │  │Web  │ │
+        │ │Search  │  │Data │ │
+        │ └────────┘  └──────┘ │
+        └──────────┬───────────┘
+                   ↓
+           ┌───────────────┐
+           │ Metadata Tag  │ ◄── Extracted using LLaMA
+           └──────┬────────┘
+                  ↓
+         ┌────────────────────┐
+         │ Retriever + Grader │ ◄── Ranks based on relevance
+         └────────┬───────────┘
+                  ↓
+           ┌──────────────┐
+           │   Generator  │ ◄── LLM summarizes for user
+           └──────────────┘
 ```
 
 ---
 
-## Docker
+## 📦 Ingestion Pipeline
+
+* Long HTML files are parsed, chunked, and passed through a LLaMA-3 model.
+* Metadata such as date, category, source, and LLM-generated tags are appended.
+* Embedded using Sentence Transformers (`all-mpnet-base-v2`).
+* Data stored in AWS EC2-hosted **Qdrant Vector Store** with EBS volume for persistence.
+
+---
+
+## 🚀 Deployment Architecture
+
+### ⚙️ Tech Stack:
+
+* **Backend API**: FastAPI (Python)
+* **LLMs**: Ollama (LLaMA-3 based), locally hosted
+* **Retriever**: LangChain SelfQueryRetriever
+* **Vector DB**: Qdrant (hosted on EC2 with persistent EBS)
+* **Metadata**: CSV-based fallback, optionally enhanced with Tavily Web Search
+* **Orchestration**: Kubernetes via Minikube (for dev)
+
+### 📁 Kubernetes Deployment Includes:
+
+* `rag-backend`: FastAPI server (with LLM calls, router, retriever, generator)
+* `ollama-service`: Lightweight container with LLaMA-3 model preloaded
+* `qdrant`: Already hosted on AWS (external URL)
+
+---
+
+### ✅ Deployment Steps (Locally with Minikube):
+
+1. **Connect to Minikube Docker Daemon**:
 
 ```bash
+& minikube -p minikube docker-env --shell powershell | Invoke-Expression
+```
+
+2. **Build Images**:
+
+```bash
+cd proxylens_backend
 docker build -t rag-backend-slim .
-docker run -p 8000:8000 rag-backend-slim
+
+cd ../ollama_docker
+docker build -t ollama-llama3 .
 ```
 
----
-
-##  Kubernetes Deployment (Minikube)
-
-###  Namespace
-
-```bash
-kubectl create namespace thinkwise-ai
-```
-
-### Apply Resources
+3. **Apply Kubernetes Configurations**:
 
 ```bash
 kubectl apply -f k8s-deployment.yaml
 ```
 
----
+4. **Check Services**:
 
-## Deployment Architecture
-
-```text
-                    +----------------------+
-                    |   Frontend (React)   |
-                    +----------+-----------+
-                               |
-                     HTTP (Port 3000)
-                               ↓
-                +--------------------------+
-                |   Backend (FastAPI App)  |
-                | LangGraph ReAct Agent    |
-                +-----------+--------------+
-                            |
-              REST (Port 11434) to Ollama LLM
-                            ↓
-                 +----------------------+
-                 | Ollama LLM Container |
-                 | Model: LLaMA 3       |
-                 +----------------------+
+```bash
+kubectl get all -n proxylens-ai
 ```
 
-All components are deployed as containers using **Minikube + Docker driver**.
+5. **Test Connectivity**:
 
+```bash
+kubectl exec -it deploy/rag-backend -n proxylens-ai -- sh
+python
+>>> import requests
+>>> requests.post("http://ollama-service:11434/api/generate", json={...})
+```
 
-## TODO
+---
 
-* MongoDB persistence for chat/idea history
-* Fine-tuned scoring logic
-* Better error handling
+## 🧪 Testing & Evaluation
+
+* Every query is routed and evaluated using a local `Evaluation LLM`.
+* Outputs compared for relevance, precision, coverage.
+* Logs tracked via logging module inside `utils/`.
+
+---
+
+## 📁 Code Structure
+
+```
+proxylens_backend/
+├── Dockerfile
+├── requirements.txt
+└── src/
+    ├── main.py               # Entry Point
+    ├── agents/               # RAG Agents
+    ├── api/v1/               # FastAPI Routes
+    ├── core/                 # Config & Security
+    ├── db/                   # Chat Memory & Metadata
+    ├── models/               # Placeholder for future use
+    ├── services/             # Generator, Retriever, Web Search
+    └── utils/                # Logging, Utilities
+```
+
+---
+
+## 📫 Contact
+
+For access or demo requests, reach out to the maintainer privately.
+
+> This backend is strictly for academic and internal demo purposes. The documents used are not disclosed.
 
 ---
